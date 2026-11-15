@@ -1,0 +1,31 @@
+# The dsh-gitbash bundle patch: replaces the PowerShell shell stack with Git
+# Bash on Windows. Applies after dsh-base and dsh-web-app; rows are addressed
+# by id with the last write winning per row.
+#
+# One composition admits exactly one ctx.shell provider, so the pwsh executor
+# row is disabled while this bundle is installed. Disabling or removing this
+# bundle drops this patch layer and restores the shipped pwsh rows.
+
+# 1) Take the Windows pwsh executor offline. POSIX keeps its shipped state
+#    (the base row is already disabled there).
+- id: pwsh-sandbox
+  disabled: true
+
+# 2) Mount the Git Bash executor as the ctx.shell provider. Windows-only:
+#    POSIX compositions already run the official bash stack unchanged.
+#    The row uses the package name so the client roster finds this package's
+#    `dsh.client` half (the scanner derives the package from the row name).
+- insert:
+    - id: gitbash-shell
+      name: dsh-gitbash
+      disabled: !!js process.platform !== 'win32'
+      config: {}
+
+# 3) Re-enable the official bash tool row on the host plane for Windows. The
+#    web layer disables host shell-tool rows because presets own them; on
+#    win32 the standard preset mounts only pwsh, so the host-plane bash tool
+#    becomes the single bash registration every agent inherits. On POSIX the
+#    preset already provides bash, so the row stays disabled to avoid a
+#    duplicate registration.
+- id: tool-bash
+  disabled: !!js process.platform !== 'win32'

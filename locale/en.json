@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "Git Bash",
+    "description": "Replaces the PowerShell shell tool with a Git Bash-backed bash tool on Windows, with a live control panel on the Plugins page.",
+    "detail": "docs/DETAIL.md"
+  }
+}
