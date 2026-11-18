@@ -9,7 +9,7 @@ English | [中文](README.zh.md)
 - **Git Bash-backed `bash` tool** for every agent preset (`standard`, `ptc`, `cordis`, `minimal`).
 - **PowerShell removed** while the plugin is active: the `pwsh` tool is restricted out of every agent's tool list, and a guard denies any late call with an explanation.
 - **One switch to rule it**: enable or disable the bundle on the Plugins page. Disabling fully restores the shipped PowerShell stack.
-- **Control panel on the Plugins page**: master switch, `bash.exe` path override, default timeout, and the model prompt-hint toggle.
+- **Settings form on the Plugins page**: `bash.exe` path override, default timeout, and the model prompt-hint toggle, built from the shared UI primitives.
 - **Keeps the official capabilities**: the shipped `dsh-tool-bash` consumer is reused unchanged, so background jobs, timeout-to-background promotion, sandbox escalation, and the exit-code contract all keep working.
 - Auto-detects Git for Windows; WSL execution aliases are never picked.
 
@@ -25,24 +25,23 @@ From the Plugins page:
 
 1. **Plugins → Add plugin**.
 2. Paste the repository spec `github:Shingwha/dsh-gitbash` (or `git+https://github.com/Shingwha/dsh-gitbash.git`) and confirm.
-3. The `Git Bash` bundle appears as enabled; **refresh the page** once so the browser loads the control panel.
+3. The `Git Bash` bundle appears as enabled; **refresh the page** once so the browser loads the settings form.
 
 Alternative — install a packed tarball: `npm pack` in a checkout produces `dsh-gitbash-<version>.tgz`; pass its absolute path to **Add plugin**.
 
 > Local-directory installs become pnpm `link:` installs, and a linked package cannot resolve the `@deepseek-ai/*` packages that ship inside DSH. Use the git spec or a packed tarball instead.
 
-Verify it works: ask an agent to run `uname -s`; it should report `MINGW64_NT-...`, the `pwsh` tool should no longer be present, and **Plugins → Git Bash** shows the control panel.
+Verify it works: ask an agent to run `uname -s`; it should report `MINGW64_NT-...`, the `pwsh` tool should no longer be present, and **Plugins → Git Bash** shows the standard settings form.
 
 ## Configuration
 
-The panel lives at **Plugins → Git Bash**. All fields are live: edits apply to new commands, and prompt changes apply to running sessions from their next step.
+The panel lives at **Plugins → Git Bash**. It uses the standard plugin settings form: edit the fields, then press **Save**. All fields are volatile, so saved values apply to new commands, and prompt changes apply to running sessions from their next step. Enable or disable the bundle with the switch on the plugin page itself.
 
 | Field | Default | Meaning |
 |---|---|---|
-| Git Bash mode (master switch) | on | Enables or disables the whole bundle. Off restores the shipped PowerShell stack. |
 | `bashPath` | empty | Absolute path to `bash.exe`. Empty auto-detects: `Program Files\Git\bin`, `Program Files (x86)\Git\bin`, `LocalAppData\Programs\Git\bin`, then PATH-derived installs; WSL `WindowsApps` aliases are skipped. |
-| `promptHint` | `true` | Adds a short Git Bash guidance section to the system prompt (native/POSIX paths, `cygpath`, MSYS argument conversion, confined-session escalation). |
 | `timeoutMs` | `120000` | Default foreground timeout. Per-call overrides are capped at 600000 ms. |
+| `promptHint` | `true` | Adds a short Git Bash guidance section to the system prompt (native/POSIX paths, `cygpath`, MSYS argument conversion, confined-session escalation). |
 
 Fixed internal budgets: 64000 bytes per captured stream with a 64 MiB spill cap, and a 3000 ms kill grace. The bash tool row keeps its own official form (`enableRunInBackground`, `promoteOnTimeout`).
 
@@ -72,7 +71,7 @@ Disable the bundle on the Plugins page (or remove it). The patch layer drops, th
 ├── package.json        # bundle manifest: dsh.bundle.patch + dsh.client
 ├── cordis.patch.yml    # composition changes (rows)
 ├── index.js            # Host half: GitBashExecutor (ctx.shell), pwsh removal, prompt section
-├── client.js           # Client half: Plugins page control panel (plugins.bundle.config/row.config)
+├── client.js           # Client half: Plugins page settings form (plugins.bundle.config)
 ├── locale/*.json       # Plugin-manager title/description (en, zh)
 ├── docs/DETAIL.md      # Detail document shown on the plugin page
 └── icon.svg
@@ -81,6 +80,7 @@ Disable the bundle on the Plugins page (or remove it). The patch layer drops, th
 - Edit the sources, then `npm pack` and install the produced tarball to test a change (installed packages hot-replace; a replaced package may need one restart).
 - Syntax checks: `node --check index.js && node --check client.js`.
 - The Client half is plain JavaScript (`window.__ModuleLoader__.load`); no build step is required.
+- The panel is the shared `SettingsForm` / `SettingsFormModel` from `@deepseek-ai/dsh-client-ui-primitives`; it registers only `plugins.bundle.config` and edits the `gitbash-shell` settings namespace.
 - Versioning: bump `version` in `package.json` for every install, because the loader caches a package generation by name.
 
 ## License

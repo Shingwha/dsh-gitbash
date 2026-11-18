@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Git Bash",
-    "description": "在 Windows 上用 Git Bash 驱动 bash 工具取代 PowerShell，插件页提供总开关与执行预算配置。",
+    "description": "在 Windows 上用 Git Bash 驱动 bash 工具取代 PowerShell，插件页提供标准设置表单。",
     "detail": "docs/DETAIL.md"
   }
 }

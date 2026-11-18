@@ -1,7 +1,7 @@
 {
   "name": "dsh-gitbash",
-  "version": "1.3.0",
-  "description": "DeepSeek Harness plugin that replaces the PowerShell shell tool with Git Bash on Windows, with a configurable control panel.",
+  "version": "1.4.0",
+  "description": "DeepSeek Harness plugin that replaces the PowerShell shell tool with Git Bash on Windows, configured from the standard plugin settings form.",
   "type": "module",
   "license": "MIT",
   "author": "Shingwha",
@@ -63,8 +63,7 @@
         "@deepseek-ai/dsh-client-locale",
         "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-ui-plugin-manager",
-        "@deepseek-ai/dsh-client-ui-settings",
-        "@deepseek-ai/dsh-api-remotes"
+        "@deepseek-ai/dsh-client-ui-settings"
       ]
     }
   }

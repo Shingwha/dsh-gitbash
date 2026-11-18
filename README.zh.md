@@ -9,7 +9,7 @@
 - **Git Bash 驱动的 `bash` 工具**，覆盖全部 Agent 预设（`standard`、`ptc`、`cordis`、`minimal`）。
 - **PowerShell 被移除**：插件启用时，`pwsh` 会从每个 Agent 的工具列表中被 restrict 移除，另有 guard 兜底拒绝任何漏网调用并给出原因。
 - **一个开关控制一切**：Plugins 页启用/停用本 bundle。停用即完整回退官方 PowerShell 栈。
-- **Plugins 页控制面板**：总开关、`bash.exe` 路径覆盖、默认超时、模型提示开关。
+- **Plugins 页设置表单**：`bash.exe` 路径覆盖、默认超时、模型提示开关，使用官方共享 UI 组件。
 - **复用官方能力**：CLI 侧原样复用官方 `dsh-tool-bash`，后台任务、超时转后台、沙箱升级、退出码契约全部保留。
 - 自动探测 Git for Windows 安装位置，绝不误选 WSL 执行别名。
 
@@ -25,24 +25,23 @@
 
 1. **Plugins → Add plugin**。
 2. 粘贴仓库简写 `github:Shingwha/dsh-gitbash`（或 `git+https://github.com/Shingwha/dsh-gitbash.git`）并确认。
-3. 出现 `Git Bash` bundle 且已启用；**刷新一次页面**，让浏览器加载控制面板。
+3. 出现 `Git Bash` bundle 且已启用；**刷新一次页面**，让浏览器加载设置表单。
 
 备选方式：在仓库里执行 `npm pack` 得到 `dsh-gitbash-<version>.tgz`，把绝对路径传给 **Add plugin**。
 
 > 本地目录安装会变成 pnpm 的 `link:` 安装，链接包无法解析 DSH 内置的 `@deepseek-ai/*` 包。请使用 git spec 或打包后的 tarball。
 
-验证：让 Agent 执行 `uname -s`，应输出 `MINGW64_NT-...`；工具列表里不再有 `pwsh`；**Plugins → Git Bash** 能看到控制面板。
+验证：让 Agent 执行 `uname -s`，应输出 `MINGW64_NT-...`；工具列表里不再有 `pwsh`；**Plugins → Git Bash** 能看到标准设置表单。
 
 ## 配置
 
-面板位于 **Plugins → Git Bash**。所有字段即时生效：新命令立即采用新值，提示类修改从运行中会话的下一步生效。
+面板位于 **Plugins → Git Bash**，使用官方插件设置表单：修改字段后点「保存」。所有字段都是 volatile，保存后对新命令立即生效，提示类修改从运行中会话的下一步生效。启用/停用整个 bundle 请用插件页自己的开关。
 
 | 配置 | 默认 | 说明 |
 |---|---|---|
-| Git Bash 模式（总开关） | 开 | 启用/停用整个 bundle。关闭即恢复官方 PowerShell 栈。 |
 | `bashPath` | 空 | `bash.exe` 绝对路径。留空自动探测：`Program Files\Git\bin`、`Program Files (x86)\Git\bin`、`LocalAppData\Programs\Git\bin`，再从 PATH 推导；跳过 WSL 的 `WindowsApps` 别名。 |
-| `promptHint` | `true` | 向系统提示注入 Git Bash 指引（Windows/POSIX 路径、`cygpath`、MSYS 参数转换、受限会话升级提示）。 |
 | `timeoutMs` | `120000` | 默认前台超时；单次调用的覆盖上限为 600000 毫秒。 |
+| `promptHint` | `true` | 向系统提示注入 Git Bash 指引（Windows/POSIX 路径、`cygpath`、MSYS 参数转换、受限会话升级提示）。 |
 
 内部固定预算（不可配置）：每个输出流 64000 字节、溢写文件上限 64 MiB、终止宽限 3000 毫秒。bash 工具行保留官方自带表单（`enableRunInBackground`、`promoteOnTimeout`）。
 
@@ -72,7 +71,7 @@ Cygwin/MSYS2 初始化运行时必须创建命名管道，而 DSH 的 Windows �
 ├── package.json        # bundle 清单：dsh.bundle.patch + dsh.client
 ├── cordis.patch.yml    # 组合变更（行）
 ├── index.js            # Host 半：GitBashExecutor（ctx.shell）、pwsh 移除、提示段
-├── client.js           # Client 半：Plugins 页控制面板（plugins.bundle.config/row.config）
+├── client.js           # Client 半：Plugins 页设置表单（plugins.bundle.config）
 ├── locale/*.json       # 插件管理页标题/描述（en、zh）
 ├── docs/DETAIL.md      # 插件详情页文档
 └── icon.svg
@@ -81,6 +80,7 @@ Cygwin/MSYS2 初始化运行时必须创建命名管道，而 DSH 的 Windows �
 - 修改源码后 `npm pack`，安装生成的 tarball 进行测试（已安装包会被热替换；替换的包可能需要重启一次）。
 - 语法检查：`node --check index.js && node --check client.js`。
 - Client 半是纯 JavaScript（`window.__ModuleLoader__.load`），无需构建步骤。
+- 面板使用 `@deepseek-ai/dsh-client-ui-primitives` 的共享 `SettingsForm` / `SettingsFormModel`；只注册 `plugins.bundle.config`，编辑 `gitbash-shell` 设置命名空间。
 - 版本管理：每次安装前递增 `package.json` 的 `version`，因为加载器按包名缓存模块代际。
 
 ## 许可

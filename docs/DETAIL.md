@@ -20,14 +20,20 @@ and the `pwsh` tool is removed for every agent.
 
 ## Configuration (Plugins page, `gitbash-shell` row)
 
-All fields are live (volatile): edits apply to new commands and to running
-sessions from their next step.
+The form on the bundle page edits the `gitbash-shell` row's volatile fields.
+It is the shared `SettingsForm` from `@deepseek-ai/dsh-client-ui-primitives`;
+edits are staged and written together when **Save** is pressed, and leaving
+the page discards unsaved changes. Enable or disable the bundle with the
+switch on the plugin page itself.
+
+All fields are volatile: saved values apply to new commands, and prompt
+changes apply to running sessions from their next step.
 
 | Field | Default | Meaning |
 |---|---|---|
 | `bashPath` | empty | Absolute path to `bash.exe`. Empty auto-detects: `Program Files\Git\bin`, `Program Files (x86)\Git\bin`, `LocalAppData\Programs\Git\bin`, then PATH-derived installs. WSL `WindowsApps` aliases are skipped. |
-| `promptHint` | `true` | Add a short Git Bash guidance section to the system prompt (paths, `cygpath`, MSYS path conversion, confined-session escalation). |
 | `timeoutMs` | `120000` | Default foreground timeout; per-call overrides are capped at 600000 ms. |
+| `promptHint` | `true` | Add a short Git Bash guidance section to the system prompt (paths, `cygpath`, MSYS path conversion, confined-session escalation). |
 
 Fixed internal budgets (not configurable): 64000 bytes per captured stream with a 64 MiB spill cap, and a 3000 ms kill grace. The workdir falls back to the harness process directory; tool calls normally pass the session directory.
 
