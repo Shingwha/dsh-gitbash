@@ -1,6 +1,6 @@
 {
   "name": "dsh-gitbash",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "DeepSeek Harness plugin that runs the bash tool through Git Bash on Windows instead of PowerShell.",
   "type": "module",
   "license": "MIT",
